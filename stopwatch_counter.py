@@ -2,19 +2,24 @@ import RPi.GPIO as GPIO
 import pygame, sys
 import time
 from pygame.locals import *
+import threading
 cnt =0
 down=0
 starti= 0
 start=0
 first =1
+prev_inp=1
+elapsed =0
 
 def start_funct(channel):
     global down
     global starti
     global cnt
     global first
-    cnt=cnt+1
+    print("Button Pressed")
+    print(cnt)
     down=1
+    cnt=cnt+1
     if(first==1):
        starti=1
        first =0
@@ -43,21 +48,21 @@ redColor = pygame.Color(255,0,0)
 blackColor = pygame.Color(0,0,0)
 whiteColor = pygame.Color(255,255,255)
 pygame.init()
-width = 580
-height = 400
-GPIO.add_event_detect(switch,GPIO.RISING,callback=start_funct,bouncetime=300) # Setup event on pin 10 rising edge
-GPIO.add_event_detect(reset,GPIO.RISING,callback=reset_funct,bouncetime=400) # Setup event on pin 10 rising edge
-windowSurfaceObj = pygame.display.set_mode((width,height),FULLSCREEN)
+width = 1400
+height = 1200
+GPIO.add_event_detect(switch,GPIO.FALLING,callback=start_funct,bouncetime=2000) # Setup event on pin 10 rising edge
+GPIO.add_event_detect(reset,GPIO.FALLING,callback=reset_funct,bouncetime=200) # Setup event on pin 10 rising edge
+windowSurfaceObj = pygame.display.set_mode((0,0),FULLSCREEN)
 #windowSurfaceObj = pygame.display.set_mode((width,height),1,24)
 pygame.display.set_caption('STOPWATCH')
-fontObj = pygame.font.Font('freesansbold.ttf',100)
+fontObj = pygame.font.Font('freesansbold.ttf',200)
 msg = "00:00:00:000"
 msgSurfaceObj = fontObj.render(msg, False,redColor)
 cntSurfaceObj = fontObj.render(str(cnt), False,whiteColor)
 msgRectobj = msgSurfaceObj.get_rect()
-msgRectobj.center 
+msgRectobj.center=(1000,200) 
 cntRectobj=cntSurfaceObj.get_rect()
-cntRectobj.bottomright=(300,300) 
+cntRectobj.bottomright=(1000,700) 
 windowSurfaceObj.blit(msgSurfaceObj, msgRectobj)
 windowSurfaceObj.blit(cntSurfaceObj, cntRectobj)
 
@@ -78,12 +83,13 @@ try:
          pstr = psec[1:5]
          msg = msg + str(pstr)
          pygame.draw.rect(windowSurfaceObj,blackColor,Rect(0,0,width,height))
+         windowSurfaceObj.fill(blackColor)
          msgSurfaceObj = fontObj.render(msg, False,redColor)
          msgRectobj = msgSurfaceObj.get_rect()
-         msgRectobj.center
+         msgRectobj.center=(1000,200)
          cntSurfaceObj = fontObj.render(str(cnt), False,whiteColor)
          cntRectobj = cntSurfaceObj.get_rect()
-         cntRectobj.bottomright=(300,300)
+         cntRectobj.bottomright=(1000,700)
          windowSurfaceObj.blit(msgSurfaceObj, msgRectobj)
          windowSurfaceObj.blit(cntSurfaceObj, cntRectobj)
          pygame.display.update()
@@ -92,10 +98,10 @@ try:
          msg = "00:00:00:000"
          msgSurfaceObj = fontObj.render(msg, False,redColor)
          msgRectobj = msgSurfaceObj.get_rect()
-         msgRectobj.center 
+         msgRectobj.center=(1000,200) 
          cntSurfaceObj = fontObj.render("0", False,whiteColor)
          cntRectobj = cntSurfaceObj.get_rect()
-         cntRectobj.bottomright=(300,300) 
+         cntRectobj.bottomright=(1000,700) 
          windowSurfaceObj.blit(msgSurfaceObj, msgRectobj)
          windowSurfaceObj.blit(cntSurfaceObj, cntRectobj)
          pygame.display.update()
@@ -107,7 +113,7 @@ try:
          elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False  # Set running to False to end the while loop.
-
+                sys.exit()
 except KeyboardInterrupt:
   print "Quit"
   GPIO.cleanup()
